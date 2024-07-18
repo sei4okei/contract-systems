@@ -8,7 +8,7 @@ services:
   passwordservice:
     image: docker.io/library/passwordservice
     depends_on:
-      - "passwordserver"s
+      - "passwordserver"
     container_name: passwordservice_container
     ports:
       - "8088:80"
