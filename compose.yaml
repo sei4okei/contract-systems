@@ -1,0 +1,24 @@
+version: '3.4'
+
+networks:
+  dev:
+    driver: bridge
+
+services:
+  passwordserver:
+    image: postgres:latest
+    container_name: passwordserver
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=Passwords
+    ports:
+      - "5433:5432"
+    restart: always
+    volumes:
+      - app_data:/volumes/
+    networks:
+      - dev
+
+volumes:
+  app_data:

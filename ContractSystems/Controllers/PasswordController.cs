@@ -3,6 +3,8 @@ using ContractSystems.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using DataAccess.Models;
+using System.ComponentModel.DataAnnotations;
+using BusinessLogic.Models;
 
 namespace ContractSystems.Controllers
 {
@@ -15,10 +17,28 @@ namespace ContractSystems.Controllers
             _recordService = recordService;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string Query)
         {
             var records = await _recordService.GetAllRecordsAsync();
-            return View(records);
+
+            if (Query == null || Query == "")
+            {
+                return View(records);
+            }
+
+            var filtered = await _recordService.GetFilteredRecordsAsync(Query);
+
+            if (filtered == null || filtered.Count == 0)
+            {
+                ModelState.AddModelError("Query", "–езультатов не найдено, попробуйте другой запрос");
+                return View(records);
+            }
+
+            return View(new IndexViewModel()
+            {
+                Query = Query,
+                Records = filtered
+            });
         }
 
         [HttpGet]
@@ -32,9 +52,56 @@ namespace ContractSystems.Controllers
         {
             if (ModelState.IsValid == false) return View(record);
 
+            var isTitleEmail = new EmailAddressAttribute().IsValid(record.Title);
+            if (record.IsEmail && !isTitleEmail)
+            {
+                ModelState.AddModelError("Title", "¬ведите верную эл. почту.");
+                return View(record);
+            }
+
             var result = _recordService.AddRecord(record);
 
             if (result == false) return View(record);
+
+            return RedirectToAction("Index");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
+        {
+            if (!ModelState.IsValid) return RedirectToAction("Index");
+
+            var record = await _recordService.GetRecordByIdAsync(id);
+
+            if (record == null) return RedirectToAction("Index");
+
+            return View(record);
+        }
+
+        [HttpPost]
+        public IActionResult Edit(Record model)
+        {
+            if (!ModelState.IsValid) return View(model);
+
+            var isTitleEmail = new EmailAddressAttribute().IsValid(model.Title);
+
+            if (model.IsEmail && !isTitleEmail)
+            {
+                ModelState.AddModelError("Title", "¬ведите верную эл. почту.");
+                return View(model);
+            }
+
+            var result = _recordService.EditRecord(model);
+
+            if (result == false) return View(model);
+
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var result = await _recordService.RemoveRecord(id);
 
             return RedirectToAction("Index");
         }

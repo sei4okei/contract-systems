@@ -49,10 +49,18 @@ namespace DataAccess.Repositories
                 .FirstOrDefaultAsync(r => r.Id == id);
         }
 
+        public Task<List<Record>> GetFilteredAsync(string query)
+        {
+            return _context.Record
+                .Where(r => r.Title.Contains(query))
+                .ToListAsync();
+        }
+
         public bool Save() => _context.SaveChanges() > 0 ? true : false;
 
         public bool Update(Record record)
         {
+            _context.Attach(record);
             _context.Update(record);
             return Save();
         }

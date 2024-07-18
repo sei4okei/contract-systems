@@ -1,4 +1,5 @@
-﻿using DataAccess.Models;
+﻿using BusinessLogic.Models;
+using DataAccess.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,9 +10,11 @@ namespace BusinessLogic.Interfaces
 {
     public interface IRecordService
     {
-        Task<List<Record>> GetAllRecordsAsync();
+        Task<IndexViewModel> GetAllRecordsAsync();
         Task<Record> GetRecordByIdAsync(int id);
-        bool RemoveRecord(Record record);
+        Task<List<Record>> GetFilteredRecordsAsync(string query);
+        bool EditRecord(Record record);
+        Task<bool> RemoveRecord(int id);
         bool AddRecord(Record record);
     }
 }

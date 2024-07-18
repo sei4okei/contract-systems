@@ -4,17 +4,24 @@ using DataAccess.Interfaces;
 using DataAccess.Repositories;
 using BusinessLogic.Interfaces;
 using BusinessLogic.Services;
+using Microsoft.Extensions.Options;
 
 namespace ContractSystems
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
-            var builder = WebApplication.CreateBuilder(args);
+            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+            AppContext.SetSwitch("Npgsql.DisableDateTimeInfinityConversions", true);
 
+            var builder = WebApplication.CreateBuilder(args);
+            var connectionString = builder.Configuration
+                .GetConnectionString("DefaultConnection");
+            var options = new DbContextOptionsBuilder<PasswordContext>()
+                .UseNpgsql(connectionString).Options;
             builder.Services.AddDbContext<PasswordContext>(options =>
-                options.UseInMemoryDatabase(Guid.NewGuid().ToString()));
+                options.UseNpgsql(connectionString));
 
             builder.Services.AddScoped<IRecordRepository, RecordRepository>();
 
@@ -34,8 +41,12 @@ namespace ContractSystems
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-
             app.UseRouting();
+
+            using (PasswordContext db = new PasswordContext(options))
+            {
+                await db.Database.MigrateAsync();
+            }
 
             app.UseAuthorization();
 

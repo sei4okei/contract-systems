@@ -1,8 +1,11 @@
 ﻿using BusinessLogic.Interfaces;
+using BusinessLogic.Models;
 using DataAccess.Interfaces;
 using DataAccess.Models;
+using Microsoft.EntityFrameworkCore.Storage;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -21,12 +24,29 @@ namespace BusinessLogic.Services
 
         public bool AddRecord(Record record)
         {
+            record.RecordDate = DateTime.Now;
             return _recordRepository.Add(record);
         }
 
-        public async Task<List<Record>> GetAllRecordsAsync()
+        public bool EditRecord(Record record)
         {
-            return await _recordRepository.GetAllAsync();
+            if (record == null) return false;
+
+            return _recordRepository.Update(record);
+        }
+
+        public async Task<IndexViewModel> GetAllRecordsAsync()
+        {
+            return new IndexViewModel()
+            {
+                Query = "",
+                Records = await _recordRepository.GetAllAsync()
+            };
+        }
+
+        public Task<List<Record>> GetFilteredRecordsAsync(string query)
+        {
+            return _recordRepository.GetFilteredAsync(query);
         }
 
         public async Task<Record> GetRecordByIdAsync(int id)
@@ -34,8 +54,12 @@ namespace BusinessLogic.Services
             return await _recordRepository.GetByIdAsync(id);
         }
 
-        public bool RemoveRecord(Record record)
+        public async Task<bool> RemoveRecord(int id)
         {
+            var record = await _recordRepository.GetByIdAsync(id);
+
+            if (record == null) return false;
+
             return _recordRepository.Delete(record);
         }
     }
