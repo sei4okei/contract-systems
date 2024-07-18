@@ -1,4 +1,4 @@
-# contact-systems
+# contract-systems
 Test task for Contract Systems
 
 Сайт доступен по ссылке - http://localhost:8088
