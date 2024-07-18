@@ -1,10 +1,9 @@
-using Microsoft.EntityFrameworkCore;
+using BusinessLogic.Interfaces;
+using BusinessLogic.Services;
 using DataAccess.Context;
 using DataAccess.Interfaces;
 using DataAccess.Repositories;
-using BusinessLogic.Interfaces;
-using BusinessLogic.Services;
-using Microsoft.Extensions.Options;
+using Microsoft.EntityFrameworkCore;
 
 namespace ContractSystems
 {
