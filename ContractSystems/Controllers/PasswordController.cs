@@ -30,7 +30,7 @@ namespace ContractSystems.Controllers
 
             if (filtered == null || filtered.Count == 0)
             {
-                ModelState.AddModelError("Query", "–езультатов не найдено, попробуйте другой запрос");
+                ModelState.AddModelError("Query", "No results");
                 return View(records);
             }
 
@@ -87,7 +87,7 @@ namespace ContractSystems.Controllers
 
             if (model.IsEmail && !isTitleEmail)
             {
-                ModelState.AddModelError("Title", "¬ведите верную эл. почту.");
+                ModelState.AddModelError("Title", "Enter valid e-mail");
                 return View(model);
             }
 
