@@ -8,7 +8,8 @@ services:
   passwordservice:
     image: docker.io/library/passwordservice
     depends_on:
-      - "passwordserver"
+      passwordserver:
+        condition: service_healthy
     container_name: passwordservice_container
     ports:
       - "8088:80"
@@ -35,6 +36,8 @@ services:
       - app_data:/volumes/
     networks:
       - dev
+    healthcheck:
+      test: "exit 0"
 
 volumes:
   app_data:
