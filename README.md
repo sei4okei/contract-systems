@@ -15,7 +15,7 @@ Test task for Contract Systems
 ```cmd
 docker build . -t passwordservice
 ```
-2. Запустить контейнеры
+2. Запустить контейнеры (~1 min)
 ```cmd
 docker-compose up
 ```
